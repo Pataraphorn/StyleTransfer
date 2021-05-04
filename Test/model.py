@@ -58,12 +58,14 @@ import os
 BASE_PATH = os.getcwd()
 
 class VGG19(nn.Module):
-    def __init__(self,vgg19_path=BASE_PATH+r'/models/vgg19-dcbb9e9d.pth',pool="max"):
+    def __init__(self,vgg19_path=None,pool="max"):
         super(VGG19, self).__init__()
         self.name = 'Model vgg19 using max pooling'
         vgg19_features = models.vgg19(pretrained=False)
         # print(vgg19_path)
-        vgg19_features.load_state_dict(torch.load(vgg19_path),strict=False)
+        if vgg19_path is not None:
+            vgg19_features.load_state_dict(torch.load(vgg19_path),strict=False)
+        
         self.features = vgg19_features.features
 
         for param in self.features.parameters():
@@ -77,22 +79,13 @@ class VGG19(nn.Module):
                     self.features._modules[name] = nn.AvgPool2d(kernel_size=2, stride=2,padding=0)
 
     def forward(self, x):
-        layers = {'3':'relu1_2','8':'relu2_2','17':'relu3_4','22':'relu4_2','26':'relu4_4','35':'relu5_4'}
+        layers = {'0':'conv1_1','5':'conv2_1','10':'conv3_1','19':'conv4_1','21':'conv4_2','28':'conv5_1'}
         features = {}
         for name, layer in self.features._modules.items():
             x = layer(x)
             if name in layers:
                 features[layers[name]] = x
         return features
-
-    # def forward(self, x):
-    #     layers = {'0':'conv1_1','5':'conv2_1','10':'conv3_1','19':'conv4_1','21':'conv4_2','28':'conv5_1'}
-    #     features = {}
-    #     for name, layer in self.features._modules.items():
-    #         x = layer(x)
-    #         if name in layers:
-    #             features[layers[name]] = x
-    #     return features
 
 class ContentLoss(nn.Module):
     def __init__(self,target):
@@ -131,6 +124,36 @@ class TVLoss(nn.Module):
         return loss
 
 # use for fast transfer
+class VGG19FT(nn.Module):
+    def __init__(self,vgg19_path=None,pool="max"):
+        super(VGG19, self).__init__()
+        self.name = 'Model vgg19 using max pooling'
+        vgg19_features = models.vgg19(pretrained=False)
+        # print(vgg19_path)
+        if vgg19_path is not None:
+            vgg19_features.load_state_dict(torch.load(vgg19_path),strict=False)
+        
+        self.features = vgg19_features.features
+
+        for param in self.features.parameters():
+            param.requires_grad = False
+
+        if pool=="avg":
+            self.name = 'Model vgg19 using average pooling'
+            layers = {'4':'max_1','9':'max_2','18':'max_3','27':'max_4','36':'max_5'}
+            for name, layer in self.features._modules.items():
+                if name in layers: 
+                    self.features._modules[name] = nn.AvgPool2d(kernel_size=2, stride=2,padding=0)
+
+    def forward(self, x):
+        layers = {'3':'relu1_2','8':'relu2_2','17':'relu3_4','22':'relu4_2','26':'relu4_4','35':'relu5_4'}
+        features = {}
+        for name, layer in self.features._modules.items():
+            x = layer(x)
+            if name in layers:
+                features[layers[name]] = x
+        return features
+
 class TransformerNetwork(nn.Module):
     def __init__(self):
         super(TransformerNetwork,self).__init__()

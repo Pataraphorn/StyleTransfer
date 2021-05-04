@@ -89,12 +89,13 @@ def train():
         generated_features = VGG(generated_img)
         content_features = VGG(content_img)
         style_features = VGG(style_img)
+        print(VGG.features)
 
         optimizer.zero_grad()
 
         # content loss
         MSELoss = nn.MSELoss().to(device)
-        content_loss = CONTENT_WEIGHT * MSELoss(generated_features['relu2_2'],content_features['relu2_2'])
+        content_loss = CONTENT_WEIGHT * MSELoss(generated_features['conv4_2'],content_features['conv4_2'])
         
         # style loss
         style_loss = 0
