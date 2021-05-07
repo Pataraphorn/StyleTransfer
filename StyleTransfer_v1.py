@@ -223,7 +223,7 @@ def main(image_type,style,style_weight,content,content_weight,pool,iteration):
 
 
 if __name__ == "__main__":
-
+    get_ipython().run_line_magic('matplotlib', 'inline')
     IMAGE_TYPE = 'url'
     STYLE_IMG = 'https://github.com/nawaritlk/Senior_project/blob/frong/Model/StyleImage/Chakrabhan/0001.jpg?raw=true'
     CONTENT_IMG = 'https://github.com/nawaritlk/Senior_project/blob/frong/Model/Test/ContentImg.jpg?raw=true'
