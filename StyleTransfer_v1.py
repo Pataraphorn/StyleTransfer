@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
@@ -101,6 +102,14 @@ def showStyleContentTarget(style,content,target,title):
     ax3.imshow(im_convert(target))  
     ax3.axis('off') 
     plt.show() 
+
+def get_features(image,feature_layers,model):
+    features = {}
+    for name,layer in model._modules.items():
+        image = layer(image)
+        if name in feature_layers:
+            features[feature_layers[name]]=image
+    return  features
 
 def gram_matrix(tensor):  
    #Unwrapping the tensor dimensions into respective variables i.e. batch size, distance, height and width   
