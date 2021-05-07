@@ -122,7 +122,7 @@ def gram_matrix(tensor):
   #Returning gram matrix   
   return gram  
 
-def train(content_image,content_weight,style_image,style_weight,model,steps):
+def train(content_image,content_weight,style_image,style_weight,model,steps,device):
     feature_layers = {'0':'conv1_1','5':'conv2_1','10':'conv3_1','19':'conv4_1','21':'conv4_2','28':'conv5_1'}
     content_features=get_features(content_image,feature_layers,model)
     style_features=get_features(style_image,feature_layers,model)
@@ -195,7 +195,7 @@ def main(image_type,style,style_weight,content,content_weight,pool,iteration):
                 vgg._modules[name] = nn.AvgPool2d(kernel_size=2, stride=2,padding=0)
     device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print('Using ',device,' to process')
-
+    vgg.to(device)   
     # load image 
     if image_type=='path':
         style_image = load_image(style).to(device)
@@ -207,17 +207,17 @@ def main(image_type,style,style_weight,content,content_weight,pool,iteration):
         showAImg(im_convert(style_image),'style image')
         content_image = load_image(url=content).to(device)
         showAImg(im_convert(content_image), 'content image')
-    
-    target,result = train(content_image,content_weight,style_image,style_weight,vgg,iteration)
+
+    target,result = train(content_image,content_weight,style_image,style_weight,vgg,iteration,device)
     title = 'Iteration '+str(result[0][0])+' content loss : {:2f}'.format(result[0][2]) +' style loss : {:2f}'.format(result[0][1]) +' total loss : {:2f}'.format(result[0][3])
     showStyleContentTarget(style_image, content_image,target,title)
 
     # histogram matching
-    multi = True if target.shape[-1] > 1 else False
-    preserve_img = exposure.match_histograms(target, content_image, multichannel = multi)
-    plt.imshow(preserve_img)
-    plt.axis('off')
-    plt.show()
+    # multi = True if target.shape[-1] > 1 else False
+    # preserve_img = exposure.match_histograms(target, content_image, multichannel = multi)
+    # plt.imshow(preserve_img)
+    # plt.axis('off')
+    # plt.show()
 
     save_image(preserve_img, 'result.jpg')
 

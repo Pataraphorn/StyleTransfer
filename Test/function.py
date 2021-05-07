@@ -111,10 +111,12 @@ def histogramMatching(src, ref):
     matched = exposure.match_histograms(src, ref, multichannel = multi)
     return matched
 
-def transfer_color(src, dest):
+def luminancetransfer(src, dest):
     H,W,_ = src.shapes
-
-
+    dest_gray = cv.cvtColor(dest,cv.COLOR_BGR2GRAY)
+    src_yiq = cv.cvtColor(src,cv.COLOR_BGR2YCrCb)
+    src_yiq[...,0] = dest_gray
+    return cv.cvtColor(src_yiq,cv.COLOR_YCrCb2BGR)
     
 # def histogramEqualizeGray(img):
 #     gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)
