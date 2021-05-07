@@ -14,8 +14,7 @@ from io import BytesIO
 
 def loadImg(path):
     img = cv.imread(path)
-    print(path,type(img))
-    img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+    # print(path,type(img))
     # img=Image.open(path).convert('RGB')
     # cv.imshow("Img",img)
     return img
@@ -30,6 +29,8 @@ def loadImgURL(url):
     return img
 
 def showImg(img,name='Image'):
+    img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+    img = np.array(img/255).clip(0,1)
     plt.title(name)
     plt.imshow(img)
     plt.axis('off')
@@ -110,6 +111,11 @@ def histogramMatching(src, ref):
     matched = exposure.match_histograms(src, ref, multichannel = multi)
     return matched
 
+def transfer_color(src, dest):
+    H,W,_ = src.shapes
+
+
+    
 # def histogramEqualizeGray(img):
 #     gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)
 #     dst = cv.equalizeHist(gray)
