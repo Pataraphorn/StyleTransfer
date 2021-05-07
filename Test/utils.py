@@ -136,8 +136,9 @@ if __name__=="__main__":
     get_ipython().run_line_magic('matplotlib', 'inline')
 
     BASE_PATH = os.getcwd()
-    STYLE_IMG = r'.\StyleImage\Chakrabhan\0001.jpg'
-    CONTENT_IMG = r'.\ContentImg.jpg' 
+    print(BASE_PATH)
+    STYLE_IMG = r'./StyleImage/Chakrabhan/0001.jpg'
+    CONTENT_IMG = r'./ContentImg.jpg' 
     style = loadImg(STYLE_IMG)
     content = loadImg(CONTENT_IMG)
     
