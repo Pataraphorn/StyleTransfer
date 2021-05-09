@@ -54,6 +54,17 @@ def saveImg(img,img_path):
         print('Image should be numpy class.')
         save_image(img, img_path)
 
+def saveImgByte(image):
+    bytes_IO = io.BytesIO()
+    image.save(bytes_IO, format='JPEG')
+    byte_image = bytes_IO.getvalue()
+
+    img = Image.open(bytes_IO)
+    plt.imshow(img)
+    plt.axis('off')
+    plt.show()
+
+
 # show 3 images(numpy)
 def show3Image(style,content,target,title1='Content Image',title2='Style Image',title3='Generated Image'):
     style = cv.cvtColor(style, cv.COLOR_BGR2RGB)
@@ -133,7 +144,7 @@ class ColorPreservation(object):
 
 
 if __name__=="__main__":
-    get_ipython().run_line_magic('matplotlib', 'inline')
+    # get_ipython().run_line_magic('matplotlib', 'inline')
 
     BASE_PATH = os.getcwd()
     print(BASE_PATH)

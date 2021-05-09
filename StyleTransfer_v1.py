@@ -173,6 +173,67 @@ def train(content_image,content_weight,style_image,style_weight,model,steps,devi
         #print('Iteration ',ii,' / content loss = ',content_loss.item(),'  style loss = ',style_loss.item(),' => total loss = ',total_loss.item())
     return target,result
 
+# save image(numpy)
+def saveImg(img,img_path):
+    if type(img).__module__=='numpy':
+        img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+        img = img.astype(np.uint8)
+        io.imsave(img_path, img)
+    else:
+        print('Image should be numpy class.')
+        save_image(img, img_path)
+
+# color preservation : histogram matching, luminance only transfer
+class ColorPreservation(object):
+    def __init__(self):
+        print('Color preservation...')
+    
+    def match(name,src,ref):
+        if name == 'his':
+            print('Using method Histogram Matching')
+            img = ColorPreservation.histogramMatching(src, ref)
+        elif name == 'lumi':
+            print('Using method Luminance Only Transfer')
+            img = ColorPreservation.luminanceOnlyTransfer(src, ref)
+        return img
+
+    # color histogram matching by put source(numpy) and reference(numpy)
+    def histogramMatching(src, ref):
+        multi = True if src.shape[-1] > 1 else False
+        matched = exposure.match_histograms(src, ref, multichannel = multi)
+        return matched
+
+    # find mean, std for luminance transfer
+    def mean_std(image):
+        mean = [
+            np.mean(image[:, :, 0]),
+            np.mean(image[:, :, 1]),
+            np.mean(image[:, :, 2])
+        ]
+        std = [
+            np.std(image[:, :, 0]),
+            np.std(image[:, :, 1]),
+            np.std(image[:, :, 2])
+        ]
+        return mean,std
+
+    # color luminance transfer by put source(numpy) and reference(numpy)
+    def luminanceOnlyTransfer(src, ref):
+        src = cv.cvtColor(src,cv.COLOR_BGR2LAB)
+        ref = cv.cvtColor(ref,cv.COLOR_BGR2LAB)
+        Ms,SDs = ColorPreservation.mean_std(src)
+        Mr,SDr = ColorPreservation.mean_std(ref)
+        H,W,D = src.shape
+        for h in range(0,H):
+            for w in range(0,W):
+                for d in range(0,D):
+                    luminance_px = src[h,w,d]
+                    luminance_px = (SDr[d]/SDs[d])*(luminance_px-Ms[d])+Mr[d]
+                    luminance_px = 0 if luminance_px<0 else 255 if luminance_px>255 else luminance_px
+                    src[h,w,d] = luminance_px
+        src = cv.cvtColor(src,cv.COLOR_LAB2BGR)
+        return src
+
 def main(image_type,style,style_weight,content,content_weight,pool,iteration):
     #importing model features   
     if pool == 'max':
@@ -211,26 +272,30 @@ def main(image_type,style,style_weight,content,content_weight,pool,iteration):
     target,result = train(content_image,content_weight,style_image,style_weight,vgg,iteration,device)
     title = 'Iteration '+str(result[0][0])+' content loss : {:2f}'.format(result[0][2]) +' style loss : {:2f}'.format(result[0][1]) +' total loss : {:2f}'.format(result[0][3])
     showStyleContentTarget(style_image, content_image,target,title)
-
+    
+    target = im_convert(target)
+    saveImg(target,'target.jpg')
+    content = im_convert(content_image)
     # histogram matching
-    # multi = True if target.shape[-1] > 1 else False
-    # preserve_img = exposure.match_histograms(target, content_image, multichannel = multi)
-    # plt.imshow(preserve_img)
-    # plt.axis('off')
-    # plt.show()
+    
+    his_img = ColorPreservation.match('his',target,content)
+    saveImg(his_img,'his_img.jpg')
+    show3Image(style,content,his_img)
 
-    save_image(preserve_img, 'result.jpg')
+    lumi_img = ColorPreservation.match('lumi',target,content)
+    saveImg(lumi_img,'lumi_img.jpg')
+    show3Image(style,content,lumi_img)
 
 
 if __name__ == "__main__":
     get_ipython().run_line_magic('matplotlib', 'inline')
-    IMAGE_TYPE = 'url'
-    STYLE_IMG = 'https://github.com/nawaritlk/Senior_project/blob/frong/Model/StyleImage/Chakrabhan/0001.jpg?raw=true'
-    CONTENT_IMG = 'https://github.com/nawaritlk/Senior_project/blob/frong/Model/Test/ContentImg.jpg?raw=true'
+    # IMAGE_TYPE = 'url'
+    # STYLE_IMG = 'https://github.com/nawaritlk/Senior_project/blob/frong/Model/StyleImage/Chakrabhan/0001.jpg?raw=true'
+    # CONTENT_IMG = 'https://github.com/nawaritlk/Senior_project/blob/frong/Model/Test/ContentImg.jpg?raw=true'
     # or
-    # IMAGE_TYPE = 'path'
-    # STYLE_IMG = r'StyleImage\Chakrabhan\0001.jpg'
-    # CONTENT_IMG = r'Test\ContentImg.jpg'
+    IMAGE_TYPE = 'path'
+    STYLE_IMG = r'.\Test\StyleImage\Chakrabhan\0001.jpg'
+    CONTENT_IMG = r'.\Test\ContentImg.jpg'
 
     ITERATION = 5000
     CONTENT_WEIGHT = 1e-2
