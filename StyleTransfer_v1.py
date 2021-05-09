@@ -176,7 +176,7 @@ def train(content_image,content_weight,style_image,style_weight,model,steps,devi
 # save image(numpy)
 def saveImg(img,img_path):
     if type(img).__module__=='numpy':
-        img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+        # img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
         img = img.astype(np.uint8)
         io.imsave(img_path, img)
     else:
@@ -234,7 +234,7 @@ class ColorPreservation(object):
         src = cv.cvtColor(src,cv.COLOR_LAB2BGR)
         return src
 
-def main(image_type,style,style_weight,content,content_weight,pool,iteration):
+def main(method,image_type,style,style_weight,content,content_weight,pool,iteration):
     #importing model features   
     if pool == 'max':
         print('VGG19 using max pooling')
@@ -269,6 +269,33 @@ def main(image_type,style,style_weight,content,content_weight,pool,iteration):
         content_image = load_image(url=content).to(device)
         showAImg(im_convert(content_image), 'content image')
 
+    if method == 'before':
+        # histogram
+        style_image = im_convert(style_image)
+        content_im = im_convert(content)
+        style_his_img = ColorPreservation.match('his',style_image,content_im)
+        style_his_img = im_convertT(style_his_img)
+
+        before_his,result = train(content_image,content_weight,style_his_img ,style_weight,vgg,iteration,device)
+        title = 'Iteration '+str(result[0][0])+' content loss : {:2f}'.format(result[0][2]) +' style loss : {:2f}'.format(result[0][1]) +' total loss : {:2f}'.format(result[0][3])
+        showStyleContentTarget(style_his_img , content_image,before_his,title)
+
+        before_his_img =im_convert(before_his)
+        saveImg(before_his_img,'before_his_img.jpg')
+
+        # luminance
+        style_image = im_convert(style_image)
+        content_im = im_convert(content)
+        style_lumi_img = ColorPreservation.match('lumi',style_image,content_im)
+        style_lumi_img = im_convertT(style_lumi_img)
+
+        before_lumi,result = train(content_image,content_weight,style_lumi_img ,style_weight,vgg,iteration,device)
+        title = 'Iteration '+str(result[0][0])+' content loss : {:2f}'.format(result[0][2]) +' style loss : {:2f}'.format(result[0][1]) +' total loss : {:2f}'.format(result[0][3])
+        showStyleContentTarget(style_lumi_img , content_image,before_lumi,title)
+
+        before_lumi_img =im_convert(before_lumi)
+        saveImg(before_lumi_img,'before_lumi_img.jpg')
+
     target,result = train(content_image,content_weight,style_image,style_weight,vgg,iteration,device)
     title = 'Iteration '+str(result[0][0])+' content loss : {:2f}'.format(result[0][2]) +' style loss : {:2f}'.format(result[0][1]) +' total loss : {:2f}'.format(result[0][3])
     showStyleContentTarget(style_image, content_image,target,title)
@@ -278,13 +305,14 @@ def main(image_type,style,style_weight,content,content_weight,pool,iteration):
     content = im_convert(content_image)
     # histogram matching
     
-    his_img = ColorPreservation.match('his',target,content)
-    saveImg(his_img,'his_img.jpg')
-    show3Image(style,content,his_img)
+    if method == 'after':
+        his_img = ColorPreservation.match('his',target,content)
+        saveImg(his_img,'after_his_img.jpg')
+        show3Image(style,content,his_img)
 
-    lumi_img = ColorPreservation.match('lumi',target,content)
-    saveImg(lumi_img,'lumi_img.jpg')
-    show3Image(style,content,lumi_img)
+        lumi_img = ColorPreservation.match('lumi',target,content)
+        saveImg(lumi_img,'after_lumi_img.jpg')
+        show3Image(style,content,lumi_img)
 
 
 if __name__ == "__main__":
@@ -300,11 +328,12 @@ if __name__ == "__main__":
     #use in colab
     IMAGE_TYPE = 'path'
     STYLE_IMG = r'./Test/StyleImage/Chakrabhan/0001.jpg'
-    CONTENT_IMG = r'./Test/ContentImg.jpg'
+    CONTENT_IMG = r'./Test/ContentImage/animals/Abyssinian_13.jpg'
 
     ITERATION = 10
     CONTENT_WEIGHT = 1e-2
     STYLE_WEIGHT = 1e6
     MODEL_POOLING = 'max' # or 'avg'
 
-    main(IMAGE_TYPE,STYLE_IMG,STYLE_WEIGHT,CONTENT_IMG,CONTENT_WEIGHT,MODEL_POOLING,ITERATION)
+    METHOD = 'before' # 'after'
+    main(METHOD,IMAGE_TYPE,STYLE_IMG,STYLE_WEIGHT,CONTENT_IMG,CONTENT_WEIGHT,MODEL_POOLING,ITERATION)
