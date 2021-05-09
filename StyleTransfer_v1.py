@@ -84,10 +84,14 @@ def im_convertT(img, max_size=None):
     tensor = tensor.unsqueeze(dim=0)
     return tensor
 
-def showAImg(img,name='Image'):
-    plt.title(name)
+def resize2d(img, size):
+    return (F.adaptive_avg_pool2d(Variable(img), size)).data
+    
+def showAImg(img,name):
+    # plt.title(name)
     plt.imshow(img)
     plt.axis('off')
+    plt.savefig(name, bbox_inches='tight', pad_inches=0)
     plt.show()
 
 def showStyleContentTarget(style,content,target,title):
@@ -271,6 +275,8 @@ def main(method,image_type,style,style_weight,content,content_weight,pool,iterat
         # showAImg(im_convert(style_image),'style image')
         content_image = load_image(url=content).to(device)
         # showAImg(im_convert(content_image), 'content image')
+    style_image = resize2d(style_image, (224,224))
+    content_image = resize2d(content_image, (224,224))
 
     if method == 'before his':
         print('before his')
@@ -296,7 +302,9 @@ def main(method,image_type,style,style_weight,content,content_weight,pool,iterat
     title = 'Iteration '+str(result[0][0])+' content loss : {:2f}'.format(result[0][2]) +' style loss : {:2f}'.format(result[0][1]) +' total loss : {:2f}'.format(result[0][3])
     showStyleContentTarget(style_image, content_image,target,title)
     
+    
     target = im_convert(target)
+    showAImg(target,'target.jpg')
     # saveImg(target,'target.jpg')
     content = im_convert(content_image)
     # histogram matching
@@ -305,7 +313,7 @@ def main(method,image_type,style,style_weight,content,content_weight,pool,iterat
         print('after')
         his_img = ColorPreservation.match('his',target,content)
         # saveImg(his_img,'after_his_img.jpg')
-        showAImg(his_img,name='Image')
+        showAImg(his_img,'after_his_img.jpg')
 
         # lumi_img = ColorPreservation.match('lumi',target,content)
         # saveImg(lumi_img,'after_lumi_img.jpg')
@@ -327,7 +335,7 @@ if __name__ == "__main__":
     STYLE_IMG = r'./Test/StyleImage/Chakrabhan/0001.jpg'
     CONTENT_IMG = r'./Test/ContentImage/animals/Abyssinian_13.jpg'
 
-    ITERATION = 5000
+    ITERATION = 5
     CONTENT_WEIGHT = 1e-2
     STYLE_WEIGHT = 1e6
 
