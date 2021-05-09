@@ -293,11 +293,16 @@ if __name__ == "__main__":
     # STYLE_IMG = 'https://github.com/nawaritlk/Senior_project/blob/frong/Model/StyleImage/Chakrabhan/0001.jpg?raw=true'
     # CONTENT_IMG = 'https://github.com/nawaritlk/Senior_project/blob/frong/Model/Test/ContentImg.jpg?raw=true'
     # or
-    IMAGE_TYPE = 'path'
-    STYLE_IMG = r'.\Test\StyleImage\Chakrabhan\0001.jpg'
-    CONTENT_IMG = r'.\Test\ContentImg.jpg'
+    # IMAGE_TYPE = 'path'
+    # STYLE_IMG = r'.\Test\StyleImage\Chakrabhan\0001.jpg'
+    # CONTENT_IMG = r'.\Test\ContentImg.jpg'
 
-    ITERATION = 5000
+    #use in colab
+    IMAGE_TYPE = 'path'
+    STYLE_IMG = r'./Test/StyleImage/Chakrabhan/0001.jpg'
+    CONTENT_IMG = r'./Test/ContentImg.jpg'
+
+    ITERATION = 10
     CONTENT_WEIGHT = 1e-2
     STYLE_WEIGHT = 1e6
     MODEL_POOLING = 'max' # or 'avg'
