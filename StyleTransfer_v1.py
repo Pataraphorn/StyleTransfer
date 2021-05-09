@@ -22,6 +22,7 @@ import pandas as pd
 import requests
 from io import BytesIO
 import skimage.exposure as exposure
+from skimage import io
 
 def load_image(img_path=None,url=None,max_size=400,shape=None):  
 # Open the image, convert it into RGB and store in a variable   
@@ -254,65 +255,61 @@ def main(method,image_type,style,style_weight,content,content_weight,pool,iterat
         for name, layer in vgg._modules.items():
             if name in layers: 
                 vgg._modules[name] = nn.AvgPool2d(kernel_size=2, stride=2,padding=0)
+    
     device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print('Using ',device,' to process')
     vgg.to(device)   
+
     # load image 
     if image_type=='path':
         style_image = load_image(style).to(device)
-        showAImg(im_convert(style_image),'style image')
+        # showAImg(im_convert(style_image),'style image')
         content_image = load_image(content).to(device)
-        showAImg(im_convert(content_image), 'content image')
+        # showAImg(im_convert(content_image), 'content image')
     elif image_type=='url':
         style_image = load_image(url=style).to(device)
-        showAImg(im_convert(style_image),'style image')
+        # showAImg(im_convert(style_image),'style image')
         content_image = load_image(url=content).to(device)
-        showAImg(im_convert(content_image), 'content image')
+        # showAImg(im_convert(content_image), 'content image')
 
-    if method == 'before':
+    if method == 'before his':
+        print('before his')
         # histogram
         style_image = im_convert(style_image)
-        content_im = im_convert(content)
+        content_im = im_convert(content_image)
         style_his_img = ColorPreservation.match('his',style_image,content_im)
-        style_his_img = im_convertT(style_his_img)
-
-        before_his,result = train(content_image,content_weight,style_his_img ,style_weight,vgg,iteration,device)
-        title = 'Iteration '+str(result[0][0])+' content loss : {:2f}'.format(result[0][2]) +' style loss : {:2f}'.format(result[0][1]) +' total loss : {:2f}'.format(result[0][3])
-        showStyleContentTarget(style_his_img , content_image,before_his,title)
-
-        before_his_img =im_convert(before_his)
-        saveImg(before_his_img,'before_his_img.jpg')
-
+        style_image = im_convertT(style_his_img).type(torch.cuda.FloatTensor)
+    elif method == 'before lumi':
+        print('before lumi')
         # luminance
         style_image = im_convert(style_image)
-        content_im = im_convert(content)
+        content_im = im_convert(content_image)
         style_lumi_img = ColorPreservation.match('lumi',style_image,content_im)
-        style_lumi_img = im_convertT(style_lumi_img)
+        style_image = im_convertT(style_lumi_img).type(torch.cuda.FloatTensor)
+    elif method == 'before style':
+        print('before style')
+        style_image = style_image
 
-        before_lumi,result = train(content_image,content_weight,style_lumi_img ,style_weight,vgg,iteration,device)
-        title = 'Iteration '+str(result[0][0])+' content loss : {:2f}'.format(result[0][2]) +' style loss : {:2f}'.format(result[0][1]) +' total loss : {:2f}'.format(result[0][3])
-        showStyleContentTarget(style_lumi_img , content_image,before_lumi,title)
-
-        before_lumi_img =im_convert(before_lumi)
-        saveImg(before_lumi_img,'before_lumi_img.jpg')
-
+    print('start train')
     target,result = train(content_image,content_weight,style_image,style_weight,vgg,iteration,device)
+    print('finish train')
     title = 'Iteration '+str(result[0][0])+' content loss : {:2f}'.format(result[0][2]) +' style loss : {:2f}'.format(result[0][1]) +' total loss : {:2f}'.format(result[0][3])
     showStyleContentTarget(style_image, content_image,target,title)
     
     target = im_convert(target)
-    saveImg(target,'target.jpg')
+    # saveImg(target,'target.jpg')
     content = im_convert(content_image)
     # histogram matching
     
     if method == 'after':
+        print('after')
         his_img = ColorPreservation.match('his',target,content)
-        saveImg(his_img,'after_his_img.jpg')
-        show3Image(style,content,his_img)
+        # saveImg(his_img,'after_his_img.jpg')
+        showAImg(his_img,name='Image')
 
-        lumi_img = ColorPreservation.match('lumi',target,content)
-        saveImg(lumi_img,'after_lumi_img.jpg')
-        show3Image(style,content,lumi_img)
+        # lumi_img = ColorPreservation.match('lumi',target,content)
+        # saveImg(lumi_img,'after_lumi_img.jpg')
+        # showAImg(lumi_img,name='Image')
 
 
 if __name__ == "__main__":
@@ -330,10 +327,34 @@ if __name__ == "__main__":
     STYLE_IMG = r'./Test/StyleImage/Chakrabhan/0001.jpg'
     CONTENT_IMG = r'./Test/ContentImage/animals/Abyssinian_13.jpg'
 
-    ITERATION = 10
+    ITERATION = 5000
     CONTENT_WEIGHT = 1e-2
     STYLE_WEIGHT = 1e6
+
     MODEL_POOLING = 'max' # or 'avg'
 
-    METHOD = 'before' # 'after'
+    METHOD = 'before his' # 'before style', 'before lumi', 'before his', 'after'
+    main(METHOD,IMAGE_TYPE,STYLE_IMG,STYLE_WEIGHT,CONTENT_IMG,CONTENT_WEIGHT,MODEL_POOLING,ITERATION)
+
+    METHOD = 'before style' # 'before style', 'before lumi', 'before his', 'after'
+    main(METHOD,IMAGE_TYPE,STYLE_IMG,STYLE_WEIGHT,CONTENT_IMG,CONTENT_WEIGHT,MODEL_POOLING,ITERATION)
+
+    # METHOD = 'before lumi' # 'before style', 'before lumi', 'before his', 'after'
+    # main(METHOD,IMAGE_TYPE,STYLE_IMG,STYLE_WEIGHT,CONTENT_IMG,CONTENT_WEIGHT,MODEL_POOLING,ITERATION)
+
+    METHOD = 'after' # 'before style', 'before lumi', 'before his', 'after'
+    main(METHOD,IMAGE_TYPE,STYLE_IMG,STYLE_WEIGHT,CONTENT_IMG,CONTENT_WEIGHT,MODEL_POOLING,ITERATION)
+
+    MODEL_POOLING = 'avg'
+
+    METHOD = 'before his' # 'before style', 'before lumi', 'before his', 'after'
+    main(METHOD,IMAGE_TYPE,STYLE_IMG,STYLE_WEIGHT,CONTENT_IMG,CONTENT_WEIGHT,MODEL_POOLING,ITERATION)
+
+    METHOD = 'before style' # 'before style', 'before lumi', 'before his', 'after'
+    main(METHOD,IMAGE_TYPE,STYLE_IMG,STYLE_WEIGHT,CONTENT_IMG,CONTENT_WEIGHT,MODEL_POOLING,ITERATION)
+
+    # METHOD = 'before lumi' # 'before style', 'before lumi', 'before his', 'after'
+    # main(METHOD,IMAGE_TYPE,STYLE_IMG,STYLE_WEIGHT,CONTENT_IMG,CONTENT_WEIGHT,MODEL_POOLING,ITERATION)
+
+    METHOD = 'after' # 'before style', 'before lumi', 'before his', 'after'
     main(METHOD,IMAGE_TYPE,STYLE_IMG,STYLE_WEIGHT,CONTENT_IMG,CONTENT_WEIGHT,MODEL_POOLING,ITERATION)
