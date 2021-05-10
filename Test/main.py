@@ -90,28 +90,18 @@ def train(VGG,NUM_EPOCHS,ADAM_LR,style,STYLE_WEIGHT,content,CONTENT_WEIGHT,targe
     # target(numpy)
     return  target_img
 
-def main(pool,size,stylePath,contentPath,method,color,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT):
+def main(VGG,size,stylePath,contentPath,method,color,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT):
+    # main(pool,size,stylePath,contentPath,method,color,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
     # device = get_device()
 
-    VGG = model.VGG19(pool=pool).to(DEVICE)
-    print(VGG.name) # VGG.features
+    # VGG = model.VGG19(pool=pool).to(DEVICE)
+    # print(VGG.name) # VGG.features
 
     # load style image
     Style = fn.AImage(stylePath)
     Content = fn.AImage(contentPath)
     # fn.show2Image(Style.Img,Content.Img)
-    fig,(ax1,ax2)=plt.subplots(1,2,figsize=(5,4)) 
-    #Plotting content image   
-    ax1.set_title('Content Image')
-    ax1.imshow(Content.Img)  
-    ax1.axis('off')  
-    #Plotting style image  
-    ax2.set_title('Style Image')
-    ax2.imshow(Style.Img)
-    ax2.axis('off')  
-    plt.show()
-    plt.savefig(os.getcwd()+'/output/style_content.jpg', bbox_inches='tight', pad_inches=0, format='jpg')
-
+    
     if method == 'before':
         print('=> Before style transfer')
         if color == 'histogram':
@@ -161,43 +151,50 @@ if __name__=="__main__":
     STYLE_WEIGHT = 1e2
     CONTENT_WEIGHT = 1e-2
     IMG_SIZE = (224,224)
+    
+    VGG = model.VGG19(POOL).to(DEVICE)
+    print(VGG.name) # VGG.features
 
     BASE_PATH = os.getcwd()
-    a = main(POOL,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,COLOR,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
+    a = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,COLOR,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
     fn.FImg.save(a, BASE_PATH+'/output/max_before_no.jpg')
 
-    # b = main(POOL,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,'histogram',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(a, BASE_PATH+'/output/max_before_no.jpg')
+    b = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,'histogram',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
+    fn.FImg.save(a, BASE_PATH+'/output/max_before_no.jpg')
 
-    # c = main(POOL,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,'luminance',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(c, BASE_PATH+'/output/max_before_lumi.jpg')
+    c = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,'luminance',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
+    fn.FImg.save(c, BASE_PATH+'/output/max_before_lumi.jpg')
 
-    # d = main(POOL,IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after',COLOR,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(d, BASE_PATH+'/output/max_after_no.jpg')
+    d = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after',COLOR,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
+    fn.FImg.save(d, BASE_PATH+'/output/max_after_no.jpg')
 
-    # e = main(POOL,IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after','histogram',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(e, BASE_PATH+'/output/max_after_his.jpg')
+    e = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after','histogram',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
+    fn.FImg.save(e, BASE_PATH+'/output/max_after_his.jpg')
 
-    # f = main(POOL,IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after','luminance',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(f, BASE_PATH+'/output/max_after_lumi.jpg')
+    f = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after','luminance',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
+    fn.FImg.save(f, BASE_PATH+'/output/max_after_lumi.jpg')
 
-    # g = main('avg',IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,COLOR,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(g, BASE_PATH+'/output/max_before_no.jpg')
+    POOL = 'avg'
+    VGG = model.VGG19(POOL).to(DEVICE)
+    print(VGG.name)
 
-    # h = main('avg',IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,'histogram',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(h, BASE_PATH+'/output/max_before_his.jpg')
+    g = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,COLOR,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
+    fn.FImg.save(g, BASE_PATH+'/output/avg_before_no.jpg')
 
-    # i = main('avg',IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,'luminance',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(i, BASE_PATH+'/output/max_before_lumi.jpg')
+    h = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,'histogram',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
+    fn.FImg.save(h, BASE_PATH+'/output/avg_before_his.jpg')
 
-    # j = main('avg',IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after',COLOR,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(j, BASE_PATH+'/output/max_after_no.jpg')
+    i = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,'luminance',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
+    fn.FImg.save(i, BASE_PATH+'/output/avg_before_lumi.jpg')
 
-    # k = main('avg',IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after','histogram',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(k, BASE_PATH+'/output/max_after_his.jpg')
+    j = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after',COLOR,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
+    fn.FImg.save(j, BASE_PATH+'/output/avg_after_no.jpg')
 
-    # l = main('avg',IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after','luminance',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(l, BASE_PATH+'/output/max_after_lumi.jpg')
+    k = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after','histogram',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
+    fn.FImg.save(k, BASE_PATH+'/output/avg_after_his.jpg')
+
+    l = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after','luminance',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
+    fn.FImg.save(l, BASE_PATH+'/output/avg_after_lumi.jpg')
 
     
     # fn.FImg.save(a, BASE_PATH+'/output/max_before_no.jpg')

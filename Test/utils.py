@@ -93,10 +93,11 @@ class FImg(object):
     # save image(tensor or numpy) to jpg
     def save(img,save_name):
         if type(img).__module__=='torch': img = im_convert(img)
+        plt.figure(figsize = (10,10))
         plt.imshow(img)
         plt.axis('off')
         plt.savefig(save_name, bbox_inches='tight', pad_inches=0, format='jpg')
-        plt.show()
+        # plt.show()
 
     # change numpy or PIL Image to class bytes
     def ImgByte(image):
