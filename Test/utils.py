@@ -32,8 +32,7 @@ def show3Image(content,style,target,title1='Content Image',title2='Style Image',
     ax3.imshow(target) 
     ax3.axis('off') 
     plt.show()
-    plt.close()
-
+    
 # show 2 images(numpy)
 def show2Image(content,style,title1='Content Image',title2='Style Image'):
     fig,(ax1,ax2)=plt.subplots(1,2,figsize=(5,4))  
@@ -48,7 +47,6 @@ def show2Image(content,style,title1='Content Image',title2='Style Image'):
     ax2.imshow(style)
     ax2.axis('off')  
     plt.show()
-    plt.close()
 
 # set numpy, tensor, bytes, original size
 class AImage():
@@ -57,8 +55,7 @@ class AImage():
         self.Img = img # numpy
         self.size = self.Img.shape
         self.Tensor = im_convertT(self.Img) # tensor
-        self.Byte = FImg.ImgByte(self.Img) # bytes
-    
+
 # manage image
 class FImg(object):
     def __init__(self):

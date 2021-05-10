@@ -100,6 +100,17 @@ def main(pool,size,stylePath,contentPath,method,color,NUM_EPOCHS,ADAM_LR,STYLE_W
     Style = fn.AImage(stylePath)
     Content = fn.AImage(contentPath)
     # fn.show2Image(Style.Img,Content.Img)
+    fig,(ax1,ax2)=plt.subplots(1,2,figsize=(5,4)) 
+    #Plotting content image   
+    ax1.set_title('Content Image')
+    ax1.imshow(Content.Img)  
+    ax1.axis('off')  
+    #Plotting style image  
+    ax2.set_title('Style Image')
+    ax2.imshow(Style.Img)
+    ax2.axis('off')  
+    plt.show()
+    plt.savefig(os.getcwd()+'/output/style_content.jpg', bbox_inches='tight', pad_inches=0, format='jpg')
 
     if method == 'before':
         print('=> Before style transfer')
@@ -138,23 +149,22 @@ def main(pool,size,stylePath,contentPath,method,color,NUM_EPOCHS,ADAM_LR,STYLE_W
             return generate_img
 
 if __name__=="__main__":
-    pass
-    # get_ipython().run_line_magic('matplotlib', 'inline')
-    # STYLE_IMG = r'./StyleImage/Chakrabhan/0001.jpg'
-    # CONTENT_IMG = r'./ContentImage/animals/Abyssinian_14.jpg'
-    # POOL = 'max' # or 'avg'
-    # METHOD = 'before' # or 'after'
-    # COLOR = None # or 'histogram' or 'luminance'
+    get_ipython().run_line_magic('matplotlib', 'inline')
+    STYLE_IMG = r'./StyleImage/Chakrabhan/0001.jpg'
+    CONTENT_IMG = r'./ContentImage/animals/Abyssinian_14.jpg'
+    POOL = 'max' # or 'avg'
+    METHOD = 'before' # or 'after'
+    COLOR = None # or 'histogram' or 'luminance'
 
-    # NUM_EPOCHS = 5000
-    # ADAM_LR = 0.03
-    # STYLE_WEIGHT = 1e2
-    # CONTENT_WEIGHT = 1e-2
-    # IMG_SIZE = (224,224)
+    NUM_EPOCHS = 5000
+    ADAM_LR = 0.03
+    STYLE_WEIGHT = 1e2
+    CONTENT_WEIGHT = 1e-2
+    IMG_SIZE = (224,224)
 
-    # BASE_PATH = os.getcwd()
-    # a = main(POOL,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,COLOR,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(a, BASE_PATH+'/output/max_before_no.jpg')
+    BASE_PATH = os.getcwd()
+    a = main(POOL,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,COLOR,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
+    fn.FImg.save(a, BASE_PATH+'/output/max_before_no.jpg')
 
     # b = main(POOL,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,'histogram',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
     # fn.FImg.save(a, BASE_PATH+'/output/max_before_no.jpg')
