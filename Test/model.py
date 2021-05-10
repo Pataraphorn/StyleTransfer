@@ -87,6 +87,13 @@ class VGG19(nn.Module):
                 features[layers[name]] = x
         return features
 
+# gram_matrix function for tensor image  
+def gram_matrix(tensor):  
+    b,c,h,w=tensor.shape   
+    tensor=tensor.view(b,c,h*w)    
+    tensor_transpose = tensor.transpose(1,2) 
+    return torch.bmm(tensor,tensor_transpose) / (c*h*w)
+
 class ContentLoss(nn.Module):
     def __init__(self,target):
         super(ContentLoss,self).__init__()
@@ -95,12 +102,6 @@ class ContentLoss(nn.Module):
     def forward(self,input):
         self.loss = F.mse_loss(input,self.target)
         return input
-
-def gram_matrix(tensor):  
-    b,c,h,w=tensor.shape   
-    tensor=tensor.view(b,c,h*w)    
-    tensor_transpose = tensor.transpose(1,2) 
-    return torch.bmm(tensor,tensor_transpose) / (c*h*w)
 
 class StyleLoss(nn.Module):
     def __init__(self,target_feature):
