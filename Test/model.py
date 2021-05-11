@@ -60,7 +60,7 @@ class VGG19(nn.Module):
     def __init__(self,vgg19_path=None,pool="max"):
         super(VGG19, self).__init__()
         self.name = 'Model vgg19 using max pooling'
-        vgg19_features = models.vgg19(pretrained=False)
+        vgg19_features = models.vgg19(pretrained=True)
         # print(vgg19_path)
         if vgg19_path is not None:
             vgg19_features.load_state_dict(torch.load(vgg19_path),strict=False)
@@ -88,10 +88,10 @@ class VGG19(nn.Module):
 
 # gram_matrix function for tensor image  
 def gram_matrix(tensor):  
-    b,c,h,w=tensor.shape   
-    tensor=tensor.view(b,c,h*w)    
-    tensor_transpose = tensor.transpose(1,2) 
-    return torch.bmm(tensor,tensor_transpose) / (c*h*w)
+    _,c,h,w = tensor.size()    
+    tensor = tensor.view(c,h*w)    
+    gram = torch.mm(tensor,tensor.t())  
+    return gram
 
 class ContentLoss(nn.Module):
     def __init__(self,target):

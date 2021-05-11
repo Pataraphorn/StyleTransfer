@@ -47,7 +47,7 @@ def train(DEVICE,VGG,NUM_EPOCHS,ADAM_LR,style,STYLE_WEIGHT,content,CONTENT_WEIGH
     for epoch in range(NUM_EPOCHS):
         # print("Epoch : {}/{} running..........".format(epoch+1,NUM_EPOCHS))
         
-        # torch.cuda.empty_cache()
+        torch.cuda.empty_cache()
 
         optimizer.zero_grad()
 
@@ -65,10 +65,14 @@ def train(DEVICE,VGG,NUM_EPOCHS,ADAM_LR,style,STYLE_WEIGHT,content,CONTENT_WEIGH
         style_loss *= STYLE_WEIGHT
 
         # total loss
-        total_loss = CONTENT_WEIGHT*content_loss + STYLE_WEIGHT*style_loss
+        total_loss = content_loss + style_loss
 
         total_loss.backward()
         optimizer.step()
+
+        if (epoch+1) % 200==0:
+            fn.show3Image(fn.im_convert(content), fn.im_convert(style), fn.im_convert(target))
+            fn.FImg.save(fn.im_convert(target), 'main_it_'+str(epoch+1)+'.jpg')
 
         content_loss_history.append(content_loss.item())
         style_loss_history.append(style_loss.item())
@@ -77,7 +81,7 @@ def train(DEVICE,VGG,NUM_EPOCHS,ADAM_LR,style,STYLE_WEIGHT,content,CONTENT_WEIGH
     stop_time = time.time()
     
     # Show Result
-    print("Training time : {} seconds".format(stop_time-start_time))
+    print("Iteration : {} , Training time : {} seconds".format(NUM_EPOCHS,stop_time-start_time))
     print("=> Content Loss ",content_loss_history[-1])
     print("=> Style Loss ",style_loss_history[-1])
     print("=> Total Loss ",total_loss_history[-1])
@@ -94,6 +98,7 @@ def main(VGG,size,stylePath,contentPath,method,color,NUM_EPOCHS,ADAM_LR,STYLE_WE
 
     # VGG = model.VGG19(pool=pool).to(DEVICE)
     # print(VGG.name) # VGG.features
+    VGG = VGG.to(DEVICE)
 
     # load style image
     Style = fn.AImage(stylePath)
@@ -116,6 +121,9 @@ def main(VGG,size,stylePath,contentPath,method,color,NUM_EPOCHS,ADAM_LR,STYLE_WE
             print('Do not use color preservation')
             style = fn.FImg.resize(Style.Tensor, size).to(DEVICE)
         content = fn.FImg.resize(Content.Tensor, size).to(DEVICE)
+    else:
+        style = fn.FImg.resize(Style.Tensor, size).to(DEVICE)
+        content = fn.FImg.resize(Content.Tensor, size).to(DEVICE)
 
     target=content.clone().requires_grad_(True).to(DEVICE)
     # target=torch.randn(content.size()).type_as(content.data).requires_grad_(True).to(device) #random init
@@ -135,8 +143,8 @@ def main(VGG,size,stylePath,contentPath,method,color,NUM_EPOCHS,ADAM_LR,STYLE_WE
         else:
             print('Do not use color preservation')
             return generate_img
-    return generate_img
-
+    else:
+        return generate_img
 
 
 if __name__=="__main__":
