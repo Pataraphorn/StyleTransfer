@@ -29,8 +29,6 @@ def get_device():
         print('__CUDA Device Total Memory [GB]:',torch.cuda.get_device_properties(0).total_memory/1e9)
     return device
 
-DEVICE = get_device()
-
 def train(VGG,NUM_EPOCHS,ADAM_LR,style,STYLE_WEIGHT,content,CONTENT_WEIGHT,target):
     style_features = VGG(style)
     style_gram = {}
@@ -151,7 +149,8 @@ if __name__=="__main__":
     STYLE_WEIGHT = 1e2
     CONTENT_WEIGHT = 1e-2
     IMG_SIZE = (224,224)
-    
+    DEVICE = get_device()
+
     VGG = model.VGG19(POOL).to(DEVICE)
     print(VGG.name) # VGG.features
 

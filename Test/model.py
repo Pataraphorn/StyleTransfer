@@ -247,7 +247,7 @@ class DeconvLayer(nn.Module):
 def set_optimizer(input,optimizer="adam",lr=0.01):
     if optimizer=="adam":
         print("Optimization with Adam")
-        optimizer = optim.Adam([imput],lr=lr)
+        optimizer = optim.Adam([input],lr=lr)
     elif optimizer=="lbfgs":
         print("Optimization with LBFGS")
         optimizer = optim.LBFGS([input])
