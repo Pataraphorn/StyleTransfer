@@ -70,7 +70,7 @@ def train(DEVICE,VGG,NUM_EPOCHS,ADAM_LR,style,STYLE_WEIGHT,content,CONTENT_WEIGH
         total_loss.backward()
         optimizer.step()
 
-        if (epoch+1) % 200==0:
+        if (epoch+1)%10==0:
             fn.show3Image(fn.im_convert(content), fn.im_convert(style), fn.im_convert(target))
             fn.FImg.save(fn.im_convert(target), 'main_it_'+str(epoch+1)+'.jpg')
 
