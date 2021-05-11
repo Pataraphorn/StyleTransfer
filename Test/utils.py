@@ -3,16 +3,16 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 import skimage.exposure as exposure
-import torch
+
 import torchvision.transforms as transforms
-import torchvision.datasets as datasets
-from torch.utils.data import Dataset
+# import torchvision.datasets as datasets
+# from torch.utils.data import Dataset
 from torch.autograd import Variable
 import torch.nn.functional as F
 import os
 import requests
 from io import BytesIO
-from skimage import io,transform
+from skimage import transform
 
 # show 3 images(numpy)
 def show3Image(content,style,target,title1='Content Image',title2='Style Image',title3='Generated Image'):

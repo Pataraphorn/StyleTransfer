@@ -1,3 +1,13 @@
 {
-    "python.pythonPath": "C:\\Users\\mpata\\Anaconda3\\python.exe"
+    "python.pythonPath": "C:\\Users\\mpata\\Anaconda3\\python.exe",
+    "[json]": {
+
+        "editor.quickSuggestions": {
+            "strings": true
+        },
+        "editor.suggest.insertMode": "replace",
+    },
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingImports": "none"
+    }
 }

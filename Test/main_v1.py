@@ -1,19 +1,7 @@
-from PIL import Image
-import matplotlib.pyplot as plt
-import numpy as np
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
 
-
-import torchvision
-import torchvision.transforms as transforms
-from torchvision import models
-
-import os
-import cv2 as cv
-import pandas as pd
 import time
 
 import utils as fn
@@ -32,16 +20,16 @@ def get_device():
 def train(DEVICE,VGG,NUM_EPOCHS,ADAM_LR,style,STYLE_WEIGHT,content,CONTENT_WEIGHT,target):
     content_features = VGG(content)
     style_features = VGG(style)
-    style_gram = {}
+    style_grams = {}
     for key, value in style_features.items():
-        style_gram[key] = model.gram_matrix(value)
+        style_grams[key] = model.gram_matrix(value)
 
     # Optimizer
     optimizer = optim.Adam([target],lr=ADAM_LR)
 
     content_loss_history = []
     style_loss_history = []
-    total_loss_history = []
+    total_loss_history = [] 
 
     start_time = time.time()
     for epoch in range(NUM_EPOCHS):
@@ -49,24 +37,25 @@ def train(DEVICE,VGG,NUM_EPOCHS,ADAM_LR,style,STYLE_WEIGHT,content,CONTENT_WEIGH
         
         # torch.cuda.empty_cache()
 
-        optimizer.zero_grad()
-
         generated_features = VGG(target)
 
-        # content loss
         MSELoss = nn.MSELoss().to(DEVICE)
-        content_loss = CONTENT_WEIGHT * MSELoss(generated_features['conv4_2'],content_features['conv4_2'])
+        # content loss
+        content_loss = MSELoss(generated_features['conv4_2'],content_features['conv4_2']) 
 
         # style loss
         style_loss = 0
-        for key,value in generated_features.items():
-            s_loss = MSELoss(model.gram_matrix(value),style_gram[key])
-            style_loss += s_loss
+        for key,value in style_features.items():
+            generated_feature = generated_features[key]
+            s_loss = MSELoss(model.gram_matrix(value),style_grams[key])
+            _, d, h, w = generated_feature.shape
+            style_loss += s_loss/ (d * h * w)
         style_loss *= STYLE_WEIGHT
-
+        
         # total loss
         total_loss = CONTENT_WEIGHT*content_loss + STYLE_WEIGHT*style_loss
 
+        optimizer.zero_grad()
         total_loss.backward()
         optimizer.step()
 
@@ -149,7 +138,7 @@ if __name__=="__main__":
     # COLOR = None # or 'histogram' or 'luminance'
 
     # NUM_EPOCHS = 5000
-    # ADAM_LR = 0.03
+    # ADAM_LR = 0.003
     # STYLE_WEIGHT = 1e2
     # CONTENT_WEIGHT = 1e-2
     # IMG_SIZE = (224,224)

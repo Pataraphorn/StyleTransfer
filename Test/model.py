@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torchvision.transforms as transforms
 import torchvision.models as models
 import torch.nn.functional as F
 import torch.optim as optim
@@ -253,3 +252,5 @@ def set_optimizer(input,optimizer="adam",lr=0.01):
         optimizer = optim.LBFGS([input])
         return optimizer
 
+if __name__=="__main__":
+    pass

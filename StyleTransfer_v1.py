@@ -321,7 +321,7 @@ def main(method,image_type,style,style_weight,content,content_weight,pool,iterat
 
 
 if __name__ == "__main__":
-    get_ipython().run_line_magic('matplotlib', 'inline')
+    # get_ipython().run_line_magic('matplotlib', 'inline')
     # IMAGE_TYPE = 'url'
     # STYLE_IMG = 'https://github.com/nawaritlk/Senior_project/blob/frong/Model/StyleImage/Chakrabhan/0001.jpg?raw=true'
     # CONTENT_IMG = 'https://github.com/nawaritlk/Senior_project/blob/frong/Model/Test/ContentImg.jpg?raw=true'
@@ -335,7 +335,7 @@ if __name__ == "__main__":
     STYLE_IMG = r'./Test/StyleImage/Chakrabhan/0001.jpg'
     CONTENT_IMG = r'./Test/ContentImage/animals/Abyssinian_13.jpg'
 
-    ITERATION = 5
+    ITERATION = 5000
     CONTENT_WEIGHT = 1e-2
     STYLE_WEIGHT = 1e6
 
