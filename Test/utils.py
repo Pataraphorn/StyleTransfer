@@ -14,6 +14,10 @@ import requests
 from io import BytesIO
 from skimage import transform
 
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.figure import Figure
+import numpy as np
+
 # show 3 images(numpy)
 def show3Image(content,style,target,title1='Content Image',title2='Style Image',title3='Generated Image'):
     fig,(ax1,ax2,ax3)=plt.subplots(1,3,figsize=(10,5))  
@@ -93,7 +97,7 @@ class FImg(object):
     # save image(tensor or numpy) to jpg
     def save(img,save_name):
         if type(img).__module__=='torch': img = im_convert(img)
-        plt.figure(figsize = (10,10))
+        plt.figure(figsize = (img.shape[0]/100, img.shape[1]/100))
         plt.imshow(img)
         plt.axis('off')
         plt.savefig(save_name, bbox_inches='tight', pad_inches=0, format='jpg')
@@ -121,6 +125,20 @@ class FImg(object):
         else:
             print('Cannot resize image')
         return img
+
+def AfterLumi(image):
+    # make a Figure and attach it to a canvas
+    fig = Figure(figsize = (10,10))
+    canvas = FigureCanvasAgg(fig)
+    ax = fig.add_subplot()
+    ax.imshow(image)
+    ax.axis('off')
+    ax.autoscale('tight')
+    fig.tight_layout(pad=0)
+    canvas.draw()
+    buf = canvas.buffer_rgba()
+    X = np.asarray(buf)
+    return X
 
 # change tensor to image(numpy)
 def im_convert(tensor):  
@@ -174,8 +192,11 @@ class ColorPreservation(object):
     # color luminance transfer by put source(numpy) and reference(numpy)
     def luminanceOnlyTransfer(src, ref):
         print('Using color preservation method Luminance Only Transfer')
-        src = cv.cvtColor(src,cv.COLOR_BGR2LAB)
-        ref = cv.cvtColor(ref,cv.COLOR_BGR2LAB)
+        print(type(src),src.shape,type(ref),ref.shape)
+        src = cv.cvtColor(src.astype('uint8'),cv.COLOR_BGR2LAB)
+        FImg.show(src)
+        ref = cv.cvtColor(ref.astype('uint8'),cv.COLOR_BGR2LAB)
+        FImg.show(ref)
         Ms,SDs = ColorPreservation.mean_std(src)
         Mr,SDr = ColorPreservation.mean_std(ref)
         H,W,D = src.shape

@@ -70,9 +70,9 @@ def train(DEVICE,VGG,NUM_EPOCHS,ADAM_LR,style,STYLE_WEIGHT,content,CONTENT_WEIGH
         total_loss.backward()
         optimizer.step()
 
-        if (epoch+1)%10==0:
+        if (epoch+1)%100==0:
             fn.show3Image(fn.im_convert(content), fn.im_convert(style), fn.im_convert(target))
-            fn.FImg.save(fn.im_convert(target), 'main_it_'+str(epoch+1)+'.jpg')
+            # fn.FImg.save(fn.im_convert(target), 'main_it_'+str(epoch+1)+'.jpg')
 
         content_loss_history.append(content_loss.item())
         style_loss_history.append(style_loss.item())
@@ -137,7 +137,8 @@ def main(VGG,size,stylePath,contentPath,method,color,NUM_EPOCHS,ADAM_LR,STYLE_WE
             fn.show2Image(generate_img,generate_his,'Original Generated','Generated(histogram matching)')
             return generate_his
         elif color == 'luminance':
-            generate_lumi = fn.ColorPreservation.luminanceOnlyTransfer(generate_img, Content.Img)
+            ilumi = fn.AfterLumi(generate_img)
+            generate_lumi = fn.ColorPreservation.luminanceOnlyTransfer(ilumi, Content.Img)
             fn.show2Image(generate_img,generate_lumi,'Original Generated','Generated(luminance only transfer)')
             return generate_lumi
         else:
@@ -150,73 +151,3 @@ def main(VGG,size,stylePath,contentPath,method,color,NUM_EPOCHS,ADAM_LR,STYLE_WE
 if __name__=="__main__":
     pass
     # get_ipython().run_line_magic('matplotlib', 'inline')
-    # STYLE_IMG = r'./StyleImage/Chakrabhan/0001.jpg'
-    # CONTENT_IMG = r'./ContentImage/animals/Abyssinian_14.jpg'
-    # POOL = 'max' # or 'avg'
-    # METHOD = 'before' # or 'after'
-    # COLOR = None # or 'histogram' or 'luminance'
-
-    # NUM_EPOCHS = 5000
-    # ADAM_LR = 0.03
-    # STYLE_WEIGHT = 1e2
-    # CONTENT_WEIGHT = 1e-2
-    # IMG_SIZE = (224,224)
-
-    # DEVICE = get_device()
-    # VGG = model.VGG19(POOL).to(DEVICE)
-    # print(VGG.name) # VGG.features
-
-    # BASE_PATH = os.getcwd()
-    # a = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,COLOR,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(a, BASE_PATH+'/output/max_before_no.jpg')
-
-    # b = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,'histogram',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(a, BASE_PATH+'/output/max_before_no.jpg')
-
-    # c = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,'luminance',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(c, BASE_PATH+'/output/max_before_lumi.jpg')
-
-    # d = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after',COLOR,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(d, BASE_PATH+'/output/max_after_no.jpg')
-
-    # e = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after','histogram',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(e, BASE_PATH+'/output/max_after_his.jpg')
-
-    # f = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after','luminance',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(f, BASE_PATH+'/output/max_after_lumi.jpg')
-
-    # POOL = 'avg'
-    # VGG = model.VGG19(POOL).to(DEVICE)
-    # print(VGG.name)
-
-    # g = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,COLOR,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(g, BASE_PATH+'/output/avg_before_no.jpg')
-
-    # h = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,'histogram',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(h, BASE_PATH+'/output/avg_before_his.jpg')
-
-    # i = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,METHOD,'luminance',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(i, BASE_PATH+'/output/avg_before_lumi.jpg')
-
-    # j = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after',COLOR,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(j, BASE_PATH+'/output/avg_after_no.jpg')
-
-    # k = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after','histogram',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(k, BASE_PATH+'/output/avg_after_his.jpg')
-
-    # l = main(VGG,IMG_SIZE,STYLE_IMG,CONTENT_IMG,'after','luminance',NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT)
-    # fn.FImg.save(l, BASE_PATH+'/output/avg_after_lumi.jpg')
-
-    
-    # fn.FImg.save(a, BASE_PATH+'/output/max_before_no.jpg')
-    # fn.FImg.save(b, BASE_PATH+'/output/max_before_his.jpg')
-    # fn.FImg.save(c, BASE_PATH+'/output/max_before_lumi.jpg')
-    # fn.FImg.save(d, BASE_PATH+'/output/max_after_no.jpg')
-    # fn.FImg.save(e, BASE_PATH+'/output/max_after_his.jpg')
-    # fn.FImg.save(f, BASE_PATH+'/output/max_after_lumi.jpg')
-    # fn.FImg.save(g, BASE_PATH+'/output/max_before_no.jpg')
-    # fn.FImg.save(h, BASE_PATH+'/output/max_before_his.jpg')
-    # fn.FImg.save(i, BASE_PATH+'/output/max_before_lumi.jpg')
-    # fn.FImg.save(j, BASE_PATH+'/output/max_after_no.jpg')
-    # fn.FImg.save(k, BASE_PATH+'/output/max_after_his.jpg')
-    # fn.FImg.save(l, BASE_PATH+'/output/max_after_lumi.jpg')
