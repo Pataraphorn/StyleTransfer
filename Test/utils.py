@@ -97,7 +97,7 @@ class FImg(object):
     # save image(tensor or numpy) to jpg
     def save(img,save_name):
         if type(img).__module__=='torch': img = im_convert(img)
-        plt.figure(figsize = (img.shape[0]/100, img.shape[1]/100))
+        plt.figure(figsize = (10,10), dpi = 200)
         plt.imshow(img)
         plt.axis('off')
         plt.savefig(save_name, bbox_inches='tight', pad_inches=0, format='jpg')
@@ -128,7 +128,7 @@ class FImg(object):
 
 def After(image):
     # make a Figure and attach it to a canvas
-    fig = Figure(figsize = (10,10))
+    fig = Figure(figsize = (10,10), dpi = 200)
     canvas = FigureCanvasAgg(fig)
     ax = fig.add_subplot()
     ax.imshow(image)
@@ -138,7 +138,7 @@ def After(image):
     canvas.draw()
     buf = canvas.buffer_rgba()
     X = np.asarray(buf)
-    X = cv.cvtColor(buf, cv.COLOR_BGRA2BGR)
+    X = cv.cvtColor(X, cv.COLOR_BGRA2BGR)
     return X
 
 # change tensor to image(numpy)
@@ -194,9 +194,7 @@ class ColorPreservation(object):
     def luminanceOnlyTransfer(src, ref):
         print('Using color preservation method Luminance Only Transfer')
         src = cv.cvtColor(src,cv.COLOR_BGR2LAB)
-        FImg.show(src)
         ref = cv.cvtColor(ref,cv.COLOR_BGR2LAB)
-        FImg.show(ref)
         Ms,SDs = ColorPreservation.mean_std(src)
         Mr,SDr = ColorPreservation.mean_std(ref)
         H,W,D = src.shape
