@@ -126,7 +126,7 @@ class FImg(object):
             print('Cannot resize image')
         return img
 
-def AfterLumi(image):
+def After(image):
     # make a Figure and attach it to a canvas
     fig = Figure(figsize = (10,10))
     canvas = FigureCanvasAgg(fig)
@@ -138,6 +138,7 @@ def AfterLumi(image):
     canvas.draw()
     buf = canvas.buffer_rgba()
     X = np.asarray(buf)
+    X = cv.cvtColor(buf, cv.COLOR_BGRA2BGR)
     return X
 
 # change tensor to image(numpy)
@@ -192,10 +193,9 @@ class ColorPreservation(object):
     # color luminance transfer by put source(numpy) and reference(numpy)
     def luminanceOnlyTransfer(src, ref):
         print('Using color preservation method Luminance Only Transfer')
-        print(type(src),src.shape,type(ref),ref.shape)
-        src = cv.cvtColor(src.astype('uint8'),cv.COLOR_BGR2LAB)
+        src = cv.cvtColor(src,cv.COLOR_BGR2LAB)
         FImg.show(src)
-        ref = cv.cvtColor(ref.astype('uint8'),cv.COLOR_BGR2LAB)
+        ref = cv.cvtColor(ref,cv.COLOR_BGR2LAB)
         FImg.show(ref)
         Ms,SDs = ColorPreservation.mean_std(src)
         Mr,SDr = ColorPreservation.mean_std(ref)

@@ -133,11 +133,12 @@ def main(VGG,size,stylePath,contentPath,method,color,NUM_EPOCHS,ADAM_LR,STYLE_WE
     if method == 'after':
         print('=> After style transfer')
         if color == 'histogram':
-            generate_his = fn.ColorPreservation.histogramMatching(generate_img, Content.Img)
+            ihis = fn.After(generate_img)
+            generate_his = fn.ColorPreservation.histogramMatching(ihis, Content.Img)
             fn.show2Image(generate_img,generate_his,'Original Generated','Generated(histogram matching)')
             return generate_his
         elif color == 'luminance':
-            ilumi = fn.AfterLumi(generate_img)
+            ilumi = fn.After(generate_img)
             generate_lumi = fn.ColorPreservation.luminanceOnlyTransfer(ilumi, Content.Img)
             fn.show2Image(generate_img,generate_lumi,'Original Generated','Generated(luminance only transfer)')
             return generate_lumi
