@@ -55,7 +55,11 @@ def gram_matrix(tensor):
 
 def train(VGG,NUM_EPOCHS,ADAM_LR,style,STYLE_WEIGHT,content,CONTENT_WEIGHT,target):
     content_features = get_features(VGG,content)
+    print('===========> content_features')
+    print(content_features)
     style_features = get_features(VGG,style)
+    print('===========> style_features')
+    print(style_features)
     style_grams={layer:gram_matrix(style_features[layer]) for layer in style_features} 
 
     #Initializing style_weights dictionary  
@@ -120,10 +124,10 @@ def train(VGG,NUM_EPOCHS,ADAM_LR,style,STYLE_WEIGHT,content,CONTENT_WEIGHT,targe
     # target_img(numpy)
     return  target_img
 
-def main(VGG,size,stylePath,contentPath,method,color,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT):
+def main(size,stylePath,contentPath,method,color,NUM_EPOCHS,ADAM_LR,STYLE_WEIGHT,CONTENT_WEIGHT):
     DEVICE = get_device()
 
-    VGG = VGG.to(DEVICE)
+    VGG = VGG19().to(DEVICE)
 
     # load style image
     Style = fn.AImage(stylePath)
