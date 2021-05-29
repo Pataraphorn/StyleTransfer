@@ -23,6 +23,7 @@ import requests
 from io import BytesIO
 import skimage.exposure as exposure
 from skimage import io
+import time
 
 def load_image(img_path=None,url=None,max_size=400,shape=None):  
 # Open the image, convert it into RGB and store in a variable   
@@ -130,8 +131,12 @@ def gram_matrix(tensor):
 def train(content_image,content_weight,style_image,style_weight,model,steps,device):
     feature_layers = {'0':'conv1_1','5':'conv2_1','10':'conv3_1','19':'conv4_1','21':'conv4_2','28':'conv5_1'}
     content_features=get_features(content_image,feature_layers,model)
+    print("======> content_features")
+    print(content_features)
+    showAImg(content_features[0][0])
     style_features=get_features(style_image,feature_layers,model)
-
+    print("======> style_features")
+    print(style_features)
     style_grams={layer:gram_matrix(style_features[layer]) for layer in style_features}  
 
     #Initializing style_weights dictionary  
@@ -147,9 +152,10 @@ def train(content_image,content_weight,style_image,style_weight,model,steps,devi
     target=content_image.clone().requires_grad_(True).to(device)
     # target=torch.randn(content_image.size()).type_as(content_image.data).requires_grad_(True).to(device) #random init
 
-    optimizer=optim.Adam([target],lr=0.003)  
+    optimizer=optim.Adam([target],lr=0.03)  
     result = []
 
+    start_time = time.time()
     for ii in range(1,steps+1):
         target_features = get_features(target,feature_layers,model)
         content_loss = torch.mean((target_features['conv4_2']-content_features['conv4_2'])**2)  
@@ -176,6 +182,9 @@ def train(content_image,content_weight,style_image,style_weight,model,steps,devi
             # plt.axis('off')  
             # plt.show()
         #print('Iteration ',ii,' / content loss = ',content_loss.item(),'  style loss = ',style_loss.item(),' => total loss = ',total_loss.item())
+    stop_time = time.time()
+    # Show Result
+    print("Iteration : {} , Training time : {} seconds".format(steps,stop_time-start_time))
     return target,result
 
 # save image(numpy)

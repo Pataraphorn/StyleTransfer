@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import skimage.exposure as exposure
 
 import torchvision.transforms as transforms
-# import torchvision.datasets as datasets
-# from torch.utils.data import Dataset
+import torchvision.datasets as datasets
+from torch.utils.data import Dataset
 from torch.autograd import Variable
 import torch.nn.functional as F
 import os

@@ -9,5 +9,6 @@
     },
     "python.analysis.diagnosticSeverityOverrides": {
         "reportMissingImports": "none"
-    }
+    },
+    "jupyter.jupyterServerType": "local"
 }

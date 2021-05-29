@@ -1,19 +1,7 @@
-from PIL import Image
-import matplotlib.pyplot as plt
-import numpy as np
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
 
-
-import torchvision
-import torchvision.transforms as transforms
-from torchvision import models
-
-import os
-import cv2 as cv
-import pandas as pd
 import time
 
 import utils as fn
@@ -30,7 +18,6 @@ def get_device():
     return device
 
 def train(DEVICE,VGG,NUM_EPOCHS,ADAM_LR,style,STYLE_WEIGHT,content,CONTENT_WEIGHT,target):
-    content_features = VGG(content)
     style_features = VGG(style)
     style_gram = {}
     for key, value in style_features.items():
@@ -50,7 +37,7 @@ def train(DEVICE,VGG,NUM_EPOCHS,ADAM_LR,style,STYLE_WEIGHT,content,CONTENT_WEIGH
         torch.cuda.empty_cache()
 
         optimizer.zero_grad()
-
+        content_features = VGG(content)
         generated_features = VGG(target)
 
         # content loss
@@ -70,8 +57,8 @@ def train(DEVICE,VGG,NUM_EPOCHS,ADAM_LR,style,STYLE_WEIGHT,content,CONTENT_WEIGH
         total_loss.backward()
         optimizer.step()
 
-        if (epoch+1)%100==0:
-            fn.show3Image(fn.im_convert(content), fn.im_convert(style), fn.im_convert(target))
+        # if (epoch+1)%100==0:
+        #     fn.show3Image(fn.im_convert(content), fn.im_convert(style), fn.im_convert(target))
             # fn.FImg.save(fn.im_convert(target), 'main_it_'+str(epoch+1)+'.jpg')
 
         content_loss_history.append(content_loss.item())
