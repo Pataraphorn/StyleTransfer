@@ -8,7 +8,7 @@ image, animal image and Thai artwork. Then create new neural style transfer imag
 matching and luminance matching for color preservation (new created image has similarity color with content image).
 Second purpose is to create your art painter web application for used our developed
 
-Developer ( KMUTT CPE'students ) :
+Developer ( KMUTT CPE's students ) :
 1. Nawarit 	Longkhum		60070501028	
 2. Pataraphorn	Tanutsiriteeradet	60070501041	
 3. Sukasama	Chitaksorn		60070501065	
